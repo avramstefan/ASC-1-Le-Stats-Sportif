@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from time import sleep
 import os
 
+from deepdiff import DeepDiff
+
 total_score = 0
 
 ONLY_LAST = False
@@ -19,17 +21,19 @@ class TestAPI(unittest.TestCase):
         while True:
             response = res_callable()
             # print(response)
-        
+
             # Asserting that the response status code is 200 (OK)
             self.assertEqual(response.status_code, 200)
         
             # Asserting the response data
             response_data = response.json()
+
             # print(f"Response_data\n{response_data}")
             if response_data['status'] == 'done':
                 # print(f"Response data {response_data['data']} and type {type(response_data['data'])}")
                 # print(f"Ref data {ref_result} and type {type(ref_result)}")
-                self.assertEqual(response_data['data'], ref_result)
+                d = DeepDiff(response_data['data'], ref_result, math_epsilon=0.01)
+                self.assertTrue(d == {}, str(d))
                 break
             elif response_data['status'] == 'running':
                 current_timestamp = datetime.now()

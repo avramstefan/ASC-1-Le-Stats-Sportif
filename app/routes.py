@@ -1,5 +1,6 @@
-from app import webserver
 from flask import request, jsonify
+from . import constants as const
+from app import webserver
 
 import os
 import json
@@ -24,32 +25,35 @@ def post_endpoint():
 
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
-    print(f"JobID is {job_id}")
-    # TODO
-    # Check if job_id is valid
+    try:
+        job_id = int(job_id)
+    except:
+        return jsonify({"status": "error", "reason": "Invalid job_id"})
+    
+    if webserver.tasks_runner.job_id <= job_id or job_id < 0:
+        return jsonify({"status": "error", "reason": "Invalid job_id"})
 
-    # Check if job_id is done and return the result
-    #    res = res_for(job_id)
-    #    return jsonify({
-    #        'status': 'done',
-    #        'data': res
-    #    })
-
-    # If not, return running status
-    return jsonify({'status': 'NotImplemented'})
+    if webserver.tasks_runner.jobs[job_id]["status"] == "done":
+        with open(f"results/{job_id}") as f:
+            result = f.read()
+            return jsonify({"status": "done", "data": result})
+    else:
+        return jsonify({'status': 'running'})
 
 @webserver.route('/api/states_mean', methods=['POST'])
 def states_mean_request():
-    # Get request data
+    if request.method != 'POST':
+        return jsonify({"error": "Method not allowed"}), 405
+
     data = request.json
-    print(f"Got request {data}")
+    data["task"] = const.STATES_MEAN
+    code, job_id = webserver.tasks_runner.submit_task(**data)
 
-    # TODO
-    # Register job. Don't wait for task to finish
-    # Increment job_id counter
-    # Return associated job_id
-
-    return jsonify({"status": "NotImplemented"})
+    return jsonify({
+        "message": "Received data successfully",
+        "status": "error" if code else "success",
+        "job_id": job_id
+    })
 
 @webserver.route('/api/state_mean', methods=['POST'])
 def state_mean_request():

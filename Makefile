@@ -18,5 +18,5 @@ run_server: enforce_venv
 	flask run
 
 run_tests: enforce_venv
-	python checker/checker.py
+	python3 checker/checker.py
 

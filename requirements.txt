@@ -1,2 +1,5 @@
 flask
 requests
+numpy
+deepdiff
+pandas
