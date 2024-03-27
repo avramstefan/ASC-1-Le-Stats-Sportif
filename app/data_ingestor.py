@@ -40,11 +40,15 @@ class DataIngestor:
                 "StratificationCategory1": entry["StratificationCategory1"],
             }
 
+            locD = entry["LocationDesc"]
+
             # Can't use this data as we don't know the Data_Value
             if important_data["DataValue"] is None:
+                # If the location is not in the data, add it even if without data so we can use it later
+                if locD not in self.data[entry["Question"]]:
+                    self.data[entry["Question"]][locD] = []
                 continue
             
-            locD = entry["LocationDesc"]
             
             if locD not in self.data[entry["Question"]]:
                 self.data[entry["Question"]][locD] = [important_data]

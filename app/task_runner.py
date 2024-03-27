@@ -78,30 +78,81 @@ class TaskRunner(Thread):
 
     def states_mean(self, job_id, task):
         processed_data = {
+            # Calculate the mean of the data values for each state
             state: np.mean([float(entry["DataValue"]) for entry in self.data_ingestor.data[task["question"]][state]])
             for state in self.data_ingestor.data[task["question"]]
         }
         
-        # Calculate the mean of the data values for each state
-        self.write_result(job_id, dict(sorted(processed_data.items(), key=lambda x: x[1])))
+        return dict(sorted(processed_data.items(), key=lambda x: x[1]))
     
     def state_mean(self, job_id, task):
-        pass
+        if "state" not in task:
+            raise ValueError("State not provided")
+
+        processed_data = {
+            # Calculate the mean of the data values for the state
+            task["state"]: np.mean([float(entry["DataValue"]) for entry in self.data_ingestor.data[task["question"]][task["state"]]])
+        }    
+        
+        return processed_data
     
     def best5(self, job_id, task):
-        pass
+        processed_data = {
+            # Calculate the mean of the data values for each state
+            state: np.mean([float(entry["DataValue"]) for entry in self.data_ingestor.data[task["question"]][state]])
+            for state in self.data_ingestor.data[task["question"]]
+        }
+
+        best_is_max = False
+        if task['question'] in self.data_ingestor.questions_best_is_max:
+            best_is_max = True
+            
+        return dict(sorted(processed_data.items(), key=lambda x: x[1], reverse=best_is_max)[0:5])
     
     def worst5(self, job_id, task):
-        pass
+        processed_data = {
+            # Calculate the mean of the data values for each state
+            state: np.mean([float(entry["DataValue"]) for entry in self.data_ingestor.data[task["question"]][state]])
+            for state in self.data_ingestor.data[task["question"]]
+        }
+
+        best_is_min = False
+        if task['question'] in self.data_ingestor.questions_best_is_min:
+            best_is_min = True
+            
+        return dict(sorted(processed_data.items(), key=lambda x: x[1], reverse=best_is_min)[0:5])
     
     def global_mean(self, job_id, task):
-        pass
+        values = []
+        for state in self.data_ingestor.data[task["question"]]:
+            values.extend([float(entry["DataValue"]) for entry in self.data_ingestor.data[task["question"]][state]])
+        
+        global_mean = {
+            "global_mean": np.mean(values)
+        }
+    
+        return global_mean
     
     def diff_from_mean(self, job_id, task):
-        pass
+        global_mean = self.global_mean(job_id, task)["global_mean"]
+        states_data = self.states_mean(job_id, task)
+        
+        processed_data = {
+            state: global_mean - mean
+            for state, mean in states_data.items()
+        }
+        
+        return processed_data
     
     def state_diff_from_mean(self, job_id, task):
-        pass
+        global_mean = self.global_mean(job_id, task)["global_mean"]
+        state_mean = self.state_mean(job_id, task)[task["state"]]
+        
+        processed_data = {
+            task["state"]: global_mean - state_mean
+        }
+        
+        return processed_data
     
     def mean_by_category(self, job_id, task):
         pass
@@ -122,4 +173,8 @@ class TaskRunner(Thread):
             task = self.pool.tasks.get(block=True)
 
             # Execute task
-            self.task_mapper[task[1]["task"]](task[0], task[1])
+            data = self.task_mapper[task[1]["task"]](task[0], task[1])
+            
+            # Write result
+            self.write_result(task[0], data)
+            
