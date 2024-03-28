@@ -38,6 +38,7 @@ class DataIngestor:
                 "LocationAbbr": entry["LocationAbbr"],
                 "LocationDesc": entry["LocationDesc"],
                 "StratificationCategory1": entry["StratificationCategory1"],
+                "Stratification1": entry["Stratification1"],
             }
 
             locD = entry["LocationDesc"]

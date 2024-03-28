@@ -73,7 +73,7 @@ class TaskRunner(Thread):
     def write_result(self, job_id, result):
         with open(f"results/{job_id}", "w") as f:
             f.write(json.dumps(result))
-            
+
         self.pool.jobs[job_id]["status"] = "done"
 
     def states_mean(self, job_id, task):
@@ -155,7 +155,30 @@ class TaskRunner(Thread):
         return processed_data
     
     def mean_by_category(self, job_id, task):
-        pass
+        processed_data = {}
+        for state in self.data_ingestor.data[task["question"]]:
+            for entry in self.data_ingestor.data[task["question"]][state]:
+                category = entry["StratificationCategory1"]
+                category_value = entry["Stratification1"]
+                data_value = float(entry["DataValue"])
+
+                tuple_key = (state, category, category_value)
+                dumped_tuple_key = str(tuple_key)
+
+                if dumped_tuple_key not in processed_data:
+                    processed_data[dumped_tuple_key] = [data_value]
+                else:
+                    processed_data[dumped_tuple_key].append(data_value)
+
+        processed_data = {
+            key: np.mean(values)
+            for key, values in processed_data.items()
+        }
+        
+        # sort processed data tuple keys by the first element of the tuple, then the second
+        processed_data = dict(sorted(processed_data.items(), key=lambda x: (tuple(eval(x[0]))[0], tuple(eval(x[0]))[1], tuple(eval(x[0]))[2])))
+        
+        return processed_data
     
     def state_mean_by_category(self, job_id, task):
         pass
