@@ -120,7 +120,10 @@ class TestAPI(unittest.TestCase):
                     res_callable = lambda: requests.get(f"http://127.0.0.1:5000/api/get_results/{job_id}"),
                     ref_result = ref_result,
                     timeout_sec = 1)
-                
+                print(job_id)
+                if (job_id == 35):
+                    # sleep(5)
+                    pass
                 local_score += test_score
         total_score += min(round(local_score), test_suite_score)
 

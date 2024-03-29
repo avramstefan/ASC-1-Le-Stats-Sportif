@@ -34,7 +34,7 @@ class DataIngestor:
             important_data = {
                 "YearStart": entry["YearStart"],
                 "YearEnd": entry["YearEnd"],
-                "DataValue": entry["Data_Value"] if entry["Data_Value"] != "" else None,
+                "DataValue": entry["Data_Value"],
                 "LocationAbbr": entry["LocationAbbr"],
                 "LocationDesc": entry["LocationDesc"],
                 "StratificationCategory1": entry["StratificationCategory1"],
@@ -42,14 +42,6 @@ class DataIngestor:
             }
 
             locD = entry["LocationDesc"]
-
-            # Can't use this data as we don't know the Data_Value
-            if important_data["DataValue"] is None:
-                # If the location is not in the data, add it even if without data so we can use it later
-                if locD not in self.data[entry["Question"]]:
-                    self.data[entry["Question"]][locD] = []
-                continue
-            
             
             if locD not in self.data[entry["Question"]]:
                 self.data[entry["Question"]][locD] = [important_data]

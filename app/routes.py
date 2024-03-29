@@ -88,13 +88,7 @@ def mean_by_category_request():
 
 @webserver.route('/api/state_mean_by_category', methods=['POST'])
 def state_mean_by_category_request():
-    # TODO
-    # Get request data
-    # Register job. Don't wait for task to finish
-    # Increment job_id counter
-    # Return associated job_id
-
-    return jsonify({"status": "NotImplemented"})
+    return request_processor(request, const.STATE_MEAN_BY_CATEGORY)
 
 # You can check localhost in your browser to see what this displays
 @webserver.route('/')
