@@ -21,10 +21,8 @@ class DataIngestor:
 
         self.process_csv_data(csv_path)
 
-        
-
     def process_csv_data(self, csv_path:str):
-        with open(csv_path, 'r') as file:
+        with open("unittests/unittest_nutrition_activity_obesity_usa_subset.csv", 'r') as file:
             reader = csv.DictReader(file)
             csv_data = list(reader)
 

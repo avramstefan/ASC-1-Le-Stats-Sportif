@@ -44,6 +44,9 @@ def request_processor(request, task):
     if request.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
 
+    if webserver.tasks_runner.processing_on == False:
+        return jsonify({"job_id": -1, "reason": "Server is shutting down"})
+
     data = request.json
     data["task"] = task
     code, job_id = webserver.tasks_runner.submit_task(**data)
@@ -89,6 +92,29 @@ def mean_by_category_request():
 @webserver.route('/api/state_mean_by_category', methods=['POST'])
 def state_mean_by_category_request():
     return request_processor(request, const.STATE_MEAN_BY_CATEGORY)
+
+@webserver.route('/api/jobs', methods=['GET'])
+def jobs():
+    return jsonify(
+        {
+            "status": "done",
+            "data": [
+                {
+                    f"job_id_{job_id}": job["status"],
+                }
+                for job_id, job in webserver.tasks_runner.jobs.items()
+            ]
+        }
+    )
+
+@webserver.route('/api/num_jobs', methods=['GET'])
+def num_jobs():
+    return jsonify(len(list(filter(lambda x: x["status"] == "running", webserver.tasks_runner.jobs.values()))))
+
+@webserver.route('/api/graceful_shutdown', methods=['GET'])
+def graceful_shutdown():
+    webserver.tasks_runner.graceful_shutdown()
+    return jsonify({"status": "success"})
 
 # You can check localhost in your browser to see what this displays
 @webserver.route('/')

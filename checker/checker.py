@@ -20,7 +20,6 @@ class TestAPI(unittest.TestCase):
         initial_timestamp = datetime.now()
         while True:
             response = res_callable()
-            # print(response)
 
             # Asserting that the response status code is 200 (OK)
             self.assertEqual(response.status_code, 200)
@@ -28,18 +27,9 @@ class TestAPI(unittest.TestCase):
             # Asserting the response data
             response_data = response.json()
 
-            # print(f"Response_data\n{response_data}")
             if response_data['status'] == 'done':
-                # print(f"Response data {response_data['data']} and type {type(response_data['data'])}")
-                # print(f"Ref data {ref_result} and type {type(ref_result)}")
                 d = DeepDiff(response_data['data'], ref_result, math_epsilon=0.01)
-                try:
-                    self.assertTrue(d == {}, str(d))
-                except:
-                    print(f"Response data {response_data['data']} and type {type(response_data['data'])}")
-                    print(f"\n \nRef data {ref_result} and type {type(ref_result)}")
-                    print(d)
-                    raise
+                self.assertTrue(d == {}, str(d))
                 break
             elif response_data['status'] == 'running':
                 current_timestamp = datetime.now()
@@ -120,10 +110,7 @@ class TestAPI(unittest.TestCase):
                     res_callable = lambda: requests.get(f"http://127.0.0.1:5000/api/get_results/{job_id}"),
                     ref_result = ref_result,
                     timeout_sec = 1)
-                print(job_id)
-                if (job_id == 35):
-                    # sleep(5)
-                    pass
+
                 local_score += test_score
         total_score += min(round(local_score), test_suite_score)
 
