@@ -1,3 +1,7 @@
+"""
+    Constants for the app, enumerating the tasks that can be performed.
+"""
+
 # Tasks
 STATES_MEAN = 1
 STATE_MEAN = 2
@@ -11,6 +15,9 @@ STATE_MEAN_BY_CATEGORY = 9
 GRACEFUL_SHUTDOWN = 10
 
 def get_task_constants():
+    """
+        Returns the task constants.
+    """
     return [
         ("states_mean", STATES_MEAN),
         ("state_mean", STATE_MEAN),
