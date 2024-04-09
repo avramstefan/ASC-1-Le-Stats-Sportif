@@ -3,27 +3,27 @@
     Each task is sent to the task runner for processing. The task runner returns a job_id.
 """
 
-from flask import request, jsonify
-from . import constants as const
-from app.webserver import webserver as ws
 import json
+from flask import request, jsonify
+from app.webserver import webserver as ws
+from . import constants as const
 
 @ws.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
     """
         This function returns the result of the task with the given job_id.
     """
-    
+
     try:
         job_id = int(job_id)
     except ValueError:
         return jsonify({"status": "error", "reason": "Invalid job_id"})
-    
+
     if ws.tasks_runner.job_id <= job_id or job_id < 0:
         return jsonify({"status": "error", "reason": "Invalid job_id"})
 
     if ws.tasks_runner.jobs[job_id]["status"] == "done":
-        with open(f"results/{job_id}") as f:
+        with open(f"results/{job_id}", 'r', encoding='utf-8') as f:
             result = f.read()
             return jsonify({"status": "done", "data": json.loads(result)})
     else:
@@ -33,11 +33,11 @@ def generic_task(request, task):
     """
         This function is a generic function to process all the tasks.
     """
-    
+
     if request.method != 'POST':
         return jsonify({"error": "Method not allowed"}), 405
 
-    if ws.tasks_runner.processing_on == False:
+    if ws.tasks_runner.processing_on is False:
         return jsonify({"job_id": -1, "reason": "Server is shutting down"})
 
     data = request.json
@@ -135,7 +135,10 @@ def num_jobs():
     """
         This function returns the number of running jobs.
     """
-    return jsonify(len(list(filter(lambda x: x["status"] == "running", ws.tasks_runner.jobs.values()))))
+    return jsonify(len(list(filter(
+            lambda x: x["status"] == "running",
+            ws.tasks_runner.jobs.values()
+        ))))
 
 @ws.route('/api/graceful_shutdown', methods=['GET'])
 def graceful_shutdown():
@@ -150,9 +153,9 @@ def graceful_shutdown():
 @ws.route('/index')
 def index():
     """ Display the available routes on the webserver """
-    
+
     routes = get_defined_routes()
-    msg = f"Hello, World!\n Interact with the ws using one of the defined routes:\n"
+    msg = "Hello, World!\n Interact with the ws using one of the defined routes:\n"
 
     # Display each route as a separate HTML <p> tag
     paragraphs = ""
@@ -164,7 +167,7 @@ def index():
 
 def get_defined_routes():
     """ Get the defined routes on the webserver """
-    
+
     routes = []
     for rule in ws.url_map.iter_rules():
         methods = ', '.join(rule.methods)

@@ -49,7 +49,7 @@ class TestWebserver(unittest.TestCase):
             "question": "Percent of adults who engage in no leisure-time physical activity"
         }
         
-        self.assertEqual(states_mean(self, 1, data), {"Kentucky": 22.9, "New Hampshire": 23.4, "Louisiana": 24.9, "Iowa": 25.2, "Massachusetts": 26.5, "Arkansas": 31.9, "North Carolina": 42.7})
+        self.assertEqual(states_mean(self, data), {"Kentucky": 22.9, "New Hampshire": 23.4, "Louisiana": 24.9, "Iowa": 25.2, "Massachusetts": 26.5, "Arkansas": 31.9, "North Carolina": 42.7})
         
     def test_state_mean(self):
         data = {
@@ -57,35 +57,35 @@ class TestWebserver(unittest.TestCase):
             "state": "Kentucky"
         }
         
-        self.assertEqual(state_mean(self, 1, data), {"Kentucky": 22.9})
+        self.assertEqual(state_mean(self, data), {"Kentucky": 22.9})
         
     def test_best5(self):
         data = {
             "question": "Percent of adults who engage in no leisure-time physical activity"
         }
         
-        self.assertEqual(best5(self, 1, data), {"Kentucky": 22.9, "New Hampshire": 23.4, "Louisiana": 24.9, "Iowa": 25.2, "Massachusetts": 26.5})
+        self.assertEqual(best5(self, data), {"Kentucky": 22.9, "New Hampshire": 23.4, "Louisiana": 24.9, "Iowa": 25.2, "Massachusetts": 26.5})
         
     def test_worst5(self):
         data = {
             "question": "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"
         }
         
-        self.assertEqual(worst5(self, 1, data), {"Idaho": 46.4, "Connecticut": 55.2})
+        self.assertEqual(worst5(self, data), {"Idaho": 46.4, "Connecticut": 55.2})
         
     def test_global_mean(self):
         data = {
             "question": "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"
         }
         
-        self.assertEqual(global_mean(self, 1, data), {"global_mean": 50.8})
+        self.assertEqual(global_mean(self, data), {"global_mean": 50.8})
         
     def test_diff_from_mean(self):
         data = {
             "question": "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"
         }
         
-        self.assertEqual(diff_from_mean(self, 1, data), {"Idaho": 4.399999999999999, "Connecticut": -4.400000000000006})
+        self.assertEqual(diff_from_mean(self, data), {"Idaho": 4.399999999999999, "Connecticut": -4.400000000000006})
         
     def test_state_diff_from_mean(self):
         data = {
@@ -93,14 +93,14 @@ class TestWebserver(unittest.TestCase):
             "state": "Idaho"
         }
         
-        self.assertEqual(state_diff_from_mean(self, 1, data), {"Idaho": 4.399999999999999})
+        self.assertEqual(state_diff_from_mean(self, data), {"Idaho": 4.399999999999999})
         
     def test_mean_by_category(self):
         data = {
             "question": "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"
         }
         
-        self.assertEqual(mean_by_category(self, 1, data), {"('Connecticut', 'Race/Ethnicity', 'Non-Hispanic White')": 55.2, "('Idaho', 'Education', 'Less than high school')": 46.4})
+        self.assertEqual(mean_by_category(self, data), {"('Connecticut', 'Race/Ethnicity', 'Non-Hispanic White')": 55.2, "('Idaho', 'Education', 'Less than high school')": 46.4})
         
     def test_state_mean_by_category(self):
         data = {
@@ -108,7 +108,7 @@ class TestWebserver(unittest.TestCase):
             "state": "Connecticut"
         }
         
-        self.assertEqual(state_mean_by_category(self, 1, data), {"Connecticut": {"('Race/Ethnicity', 'Non-Hispanic White')": 55.2}})
+        self.assertEqual(state_mean_by_category(self, data), {"Connecticut": {"('Race/Ethnicity', 'Non-Hispanic White')": 55.2}})
         
 from app import webserver
 webserver.tasks_runner.graceful_shutdown()
