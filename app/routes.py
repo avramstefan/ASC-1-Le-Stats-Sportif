@@ -6,6 +6,7 @@
 import json
 from flask import request, jsonify
 from app.webserver import webserver as ws
+from app.webserver import logger
 from . import constants as const
 
 @ws.route('/api/get_results/<job_id>', methods=['GET'])
@@ -17,16 +18,20 @@ def get_response(job_id):
     try:
         job_id = int(job_id)
     except ValueError:
+        logger.info(f"Invalid job_id - {job_id}")
         return jsonify({"status": "error", "reason": "Invalid job_id"})
 
     if ws.tasks_runner.job_id <= job_id or job_id < 0:
+        logger.info(f"Invalid job_id - {job_id}")
         return jsonify({"status": "error", "reason": "Invalid job_id"})
 
     if ws.tasks_runner.jobs[job_id]["status"] == "done":
         with open(f"results/{job_id}", 'r', encoding='utf-8') as f:
             result = f.read()
+            logger.info(f"Returned result for job_id - {job_id} (done)")
             return jsonify({"status": "done", "data": json.loads(result)})
     else:
+        logger.info(f"Returned status for job_id - {job_id} (running)")
         return jsonify({'status': 'running'})
 
 def generic_task(request, task):
@@ -35,15 +40,18 @@ def generic_task(request, task):
     """
 
     if request.method != 'POST':
+        logger.info(f"Received request with invalid method - {request.method}")
         return jsonify({"error": "Method not allowed"}), 405
 
     if ws.tasks_runner.processing_on is False:
+        logger.info("Server is shutting down, can't accept new tasks")
         return jsonify({"job_id": -1, "reason": "Server is shutting down"})
 
     data = request.json
     data["task"] = task
     code, job_id = ws.tasks_runner.submit_task(**data)
 
+    logger.info(f"Received data for task - {task} with job_id - {job_id}")
     return jsonify({
         "message": "Received data successfully",
         "status": "error" if code else "success",

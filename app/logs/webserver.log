@@ -1,0 +1,4 @@
+2024-04-09 12:04:39 +0000 - app.logs.log - INFO - Returned status for job_id - 18 (running)
+2024-04-09 12:04:39 +0000 - app.logs.log - INFO - Returned result for job_id - 18 (done)
+2024-04-09 12:04:39 +0000 - app.logs.log - INFO - Received data for task - 5 with job_id - 19
+2024-04-09 12:04:39 +0000 - app.logs.log - INFO - Returned status for job_id - 19 (running)
